@@ -1,19 +1,23 @@
 import { useState, useRef, useEffect } from 'react';
 import { useStore } from '../store/useStore';
+import { useWhatsAppStore } from '../store/useWhatsAppStore';
 import { Bot, Send, Trash2, Sparkles } from 'lucide-react';
 import { format } from 'date-fns';
+import { sendWhatsAppMessage, MESSAGE_TEMPLATES, formatPhoneNumber } from '../services/whatsapp';
 
 const QUICK_COMMANDS = [
   'Qual minha agenda de hoje?',
   'Criar tarefa urgente',
   'Resumo do dia',
-  'Me lembre de beber água',
+  'Enviar briefing WhatsApp',
   'Sugerir horários para reunião',
   'Relatório de produtividade',
+  'Configurar WhatsApp',
 ];
 
 export default function AssistantPage() {
-  const { chatMessages, addChatMessage, clearChat, tasks, events, habits, reminders, currentUser } = useStore();
+  const { chatMessages, addChatMessage, clearChat, tasks, events, habits, reminders, currentUser, setCurrentPage } = useStore();
+  const { whatsappConfig, addNotificationLog } = useWhatsAppStore();
   const uid = currentUser?.id || '';
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -92,12 +96,52 @@ export default function AssistantPage() {
         `${myHabits.some(h => h.streak >= 7) ? '🌟 Excelente consistência!' : '💪 Continue firme nos seus hábitos!'}`;
     }
 
+    // WhatsApp commands
+    if (lower.includes('whatsapp') && (lower.includes('briefing') || lower.includes('enviar'))) {
+      // Send WhatsApp briefing
+      const msg = MESSAGE_TEMPLATES.morning_briefing(currentUser?.name || 'Executivo', {
+        events: myEvents.filter(e => e.date === today).length,
+        tasks: myTasks.filter(t => t.status !== 'done').length,
+        reminders: myReminders.filter(r => !r.done).length,
+        habits: myHabits.length,
+      });
+      
+      sendWhatsAppMessage(whatsappConfig, msg, 'daily_summary').then(result => {
+        addNotificationLog({
+          userId: uid,
+          type: 'daily_summary',
+          title: 'Briefing via DOLA IA',
+          message: msg,
+          channel: 'whatsapp',
+          status: result.success ? 'sent' : 'failed',
+          scheduledAt: new Date().toISOString(),
+          sentAt: result.success ? new Date().toISOString() : undefined,
+          error: result.error,
+        });
+      });
+      
+      return `📱 **Enviando Briefing por WhatsApp!**\n\n` +
+        `📞 Número: ${formatPhoneNumber(whatsappConfig.phoneNumber)}\n` +
+        `📊 Modo: ${whatsappConfig.provider === 'demo' ? 'Demonstração (veja console)' : whatsappConfig.provider}\n\n` +
+        `${whatsappConfig.provider === 'demo' ? '⚠️ No modo demo, a mensagem é simulada. Configure uma API real no módulo WhatsApp para envio real.' : '✅ Mensagem enviada!'}`;
+    }
+
+    if (lower.includes('whatsapp') && lower.includes('config')) {
+      setCurrentPage('whatsapp');
+      return `⚙️ **Configurar WhatsApp**\n\n` +
+        `Redirecionando para a página de configuração do WhatsApp...\n\n` +
+        `📞 Número atual: ${formatPhoneNumber(whatsappConfig.phoneNumber)}\n` +
+        `📊 Provedor: ${whatsappConfig.provider}\n` +
+        `✅ Status: ${whatsappConfig.enabled ? 'Ativo' : 'Desativado'}`;
+    }
+
     return `🤖 Entendi sua mensagem. Aqui estão algumas coisas que posso fazer:\n\n` +
       `• **"Qual minha agenda de hoje?"** — Ver compromissos\n` +
       `• **"Resumo do dia"** — Relatório completo\n` +
-      `• **"Relatório de produtividade"** — Análise de desempenho\n` +
-      `• **"Sugerir horários"** — Horários disponíveis\n\n` +
-      `💡 Em breve, integração com OpenAI/ChatGPT para respostas ainda mais inteligentes!`;
+      `• **"Enviar briefing WhatsApp"** — Enviar resumo por WhatsApp\n` +
+      `• **"Configurar WhatsApp"** — Ajustar notificações\n` +
+      `• **"Relatório de produtividade"** — Análise de desempenho\n\n` +
+      `💡 WhatsApp integrado! Diga "enviar briefing" para testar.`;
   };
 
   const handleSend = () => {

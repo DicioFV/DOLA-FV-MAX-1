@@ -2,7 +2,7 @@ import { useStore } from '../store/useStore';
 import {
   LayoutDashboard, CalendarDays, CheckSquare, Bell, Heart,
   TrendingUp, Wallet, Users, Settings, LogOut,
-  Target, FileText, Menu, X, Bot
+  Target, FileText, Menu, X, Bot, MessageCircle
 } from 'lucide-react';
 
 const menuItems = [
@@ -16,6 +16,7 @@ const menuItems = [
   { id: 'notes', label: 'Notas', icon: FileText },
   { id: 'productivity', label: 'Produtividade', icon: TrendingUp },
   { id: 'assistant', label: 'DOLA IA', icon: Bot },
+  { id: 'whatsapp', label: 'WhatsApp', icon: MessageCircle },
 ];
 
 const adminItems = [

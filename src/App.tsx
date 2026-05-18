@@ -1,4 +1,5 @@
 import { useStore } from './store/useStore';
+import { useNotifications } from './hooks/useNotifications';
 import LoginPage from './components/LoginPage';
 import Sidebar from './components/Sidebar';
 import DashboardPage from './pages/DashboardPage';
@@ -13,12 +14,16 @@ import ProductivityPage from './pages/ProductivityPage';
 import AssistantPage from './pages/AssistantPage';
 import UsersPage from './pages/UsersPage';
 import SettingsPage from './pages/SettingsPage';
+import WhatsAppPage from './pages/WhatsAppPage';
 import { Bell, Search } from 'lucide-react';
 import { useState } from 'react';
 
 function AppContent() {
   const { currentPage, currentUser, reminders, setCurrentPage } = useStore();
   const pendingReminders = reminders.filter(r => r.userId === currentUser?.id && !r.done);
+  
+  // Initialize notification system
+  useNotifications();
   const [showSearch, setShowSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -35,6 +40,7 @@ function AppContent() {
     assistant: <AssistantPage />,
     users: <UsersPage />,
     settings: <SettingsPage />,
+    whatsapp: <WhatsAppPage />,
   };
 
   const pageTitle: Record<string, string> = {
@@ -50,6 +56,7 @@ function AppContent() {
     assistant: 'DOLA IA',
     users: 'Usuários',
     settings: 'Configurações',
+    whatsapp: 'WhatsApp',
   };
 
   return (

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useStore, Reminder } from '../store/useStore';
-import { Bell, Plus, X, Check, Trash2, AlertCircle } from 'lucide-react';
+import { Bell, Plus, X, Check, Trash2, AlertCircle, MessageCircle } from 'lucide-react';
+import { MESSAGE_TEMPLATES, generateWhatsAppLink } from '../services/whatsapp';
 
 const CATEGORIES = ['Negócios', 'Família', 'Saúde', 'Espiritual', 'Financeiro', 'Pessoal'];
 const PRIORITY_COLORS: Record<string, string> = {
@@ -81,6 +82,18 @@ export default function RemindersPage() {
                   </span>
                 </div>
                 <div className="flex items-center gap-1">
+                  <button 
+                    onClick={() => {
+                      const time = new Date(r.datetime).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+                      const msg = MESSAGE_TEMPLATES.reminder(r.title, time, r.priority);
+                      const link = generateWhatsAppLink('+5521964367184', msg);
+                      window.open(link, '_blank');
+                    }}
+                    className="p-1.5 rounded-lg text-dola-muted hover:text-green-500 hover:bg-green-500/10 transition-colors"
+                    title="Enviar por WhatsApp"
+                  >
+                    <MessageCircle size={14} />
+                  </button>
                   <button onClick={() => updateReminder(r.id, { done: !r.done })} className={`p-1.5 rounded-lg transition-colors ${r.done ? 'text-dola-success bg-dola-success/10' : 'text-dola-muted hover:text-dola-success hover:bg-dola-success/10'}`}>
                     <Check size={14} />
                   </button>
