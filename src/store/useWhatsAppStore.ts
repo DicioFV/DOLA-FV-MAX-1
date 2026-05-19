@@ -74,8 +74,8 @@ interface WhatsAppState {
 const DEFAULT_CONFIG: WhatsAppConfig = {
   enabled: true,
   phoneNumber: '+5521964367184',
-  provider: 'demo',
-  apiKey: '',
+  provider: 'callmebot', // Usando CallMeBot gratuito por padrão
+  apiKey: '', // Usuário precisa ativar e colar a API key
   apiUrl: '',
   instanceName: '',
 };

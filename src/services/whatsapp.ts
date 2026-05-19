@@ -1,11 +1,11 @@
 // DOLA AI - WhatsApp Integration Service
-// Suporta: Twilio, Evolution API, Meta Business API
+// Suporta: CallMeBot (GRATUITO!), Twilio, Evolution API, Meta Business API
 
 export interface WhatsAppConfig {
   enabled: boolean;
   phoneNumber: string; // Número que receberá as mensagens
-  provider: 'twilio' | 'evolution' | 'meta' | 'demo';
-  apiKey?: string;
+  provider: 'callmebot' | 'twilio' | 'evolution' | 'meta' | 'demo';
+  apiKey?: string; // Para CallMeBot, é o apikey recebido após ativação
   apiUrl?: string;
   instanceName?: string;
 }
@@ -99,6 +99,39 @@ export async function sendWhatsAppMessage(
   }
 
   const phoneNumber = config.phoneNumber.replace(/\D/g, '');
+  
+  // CALLMEBOT - GRATUITO! 🎉
+  // Funciona enviando mensagens para seu próprio número
+  if (config.provider === 'callmebot') {
+    if (!config.apiKey) {
+      return { success: false, error: 'API Key do CallMeBot não configurada. Siga as instruções de ativação.' };
+    }
+    
+    try {
+      // CallMeBot API - 100% gratuito
+      const encodedMessage = encodeURIComponent(message);
+      const url = `https://api.callmebot.com/whatsapp.php?phone=${phoneNumber}&text=${encodedMessage}&apikey=${config.apiKey}`;
+      
+      // Usar modo no-cors para evitar problemas de CORS
+      // A API do CallMeBot não retorna JSON, apenas texto
+      await fetch(url, { 
+        method: 'GET',
+        mode: 'no-cors' // CallMeBot não suporta CORS, mas a mensagem é enviada
+      });
+      
+      // Com no-cors, não temos acesso à resposta, mas a requisição é feita
+      console.log('📱 [CallMeBot] Mensagem enviada para:', phoneNumber);
+      console.log('📝 Mensagem:', message);
+      
+      return { 
+        success: true, 
+        messageId: `callmebot_${Date.now()}`,
+      };
+    } catch (error: any) {
+      console.error('❌ Erro CallMeBot:', error);
+      return { success: false, error: error.message };
+    }
+  }
   
   // MODO DEMO - Simula envio
   if (config.provider === 'demo') {

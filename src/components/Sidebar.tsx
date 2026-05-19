@@ -2,7 +2,7 @@ import { useStore } from '../store/useStore';
 import {
   LayoutDashboard, CalendarDays, CheckSquare, Bell, Heart,
   TrendingUp, Wallet, Users, Settings, LogOut,
-  Target, FileText, Menu, X, Bot, MessageCircle
+  Target, FileText, Menu, X, Bot, MessageCircle, Calculator, PiggyBank
 } from 'lucide-react';
 
 const menuItems = [
@@ -12,6 +12,8 @@ const menuItems = [
   { id: 'reminders', label: 'Lembretes', icon: Bell },
   { id: 'habits', label: 'Hábitos', icon: Target },
   { id: 'finance', label: 'Financeiro', icon: Wallet },
+  { id: 'debts', label: 'Gestor Dívidas', icon: Calculator },
+  { id: 'investments', label: 'Investimentos', icon: PiggyBank },
   { id: 'family', label: 'Família', icon: Heart },
   { id: 'notes', label: 'Notas', icon: FileText },
   { id: 'productivity', label: 'Produtividade', icon: TrendingUp },

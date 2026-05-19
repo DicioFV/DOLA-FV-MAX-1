@@ -15,6 +15,8 @@ import AssistantPage from './pages/AssistantPage';
 import UsersPage from './pages/UsersPage';
 import SettingsPage from './pages/SettingsPage';
 import WhatsAppPage from './pages/WhatsAppPage';
+import DebtManagerPage from './pages/DebtManagerPage';
+import InvestmentsPage from './pages/InvestmentsPage';
 import { Bell, Search } from 'lucide-react';
 import { useState } from 'react';
 
@@ -34,6 +36,8 @@ function AppContent() {
     reminders: <RemindersPage />,
     habits: <HabitsPage />,
     finance: <FinancePage />,
+    debts: <DebtManagerPage />,
+    investments: <InvestmentsPage />,
     family: <FamilyPage />,
     notes: <NotesPage />,
     productivity: <ProductivityPage />,
@@ -50,6 +54,8 @@ function AppContent() {
     reminders: 'Lembretes',
     habits: 'Hábitos',
     finance: 'Financeiro',
+    debts: 'Gestor de Dívidas',
+    investments: 'Investimentos',
     family: 'Família',
     notes: 'Notas',
     productivity: 'Produtividade',

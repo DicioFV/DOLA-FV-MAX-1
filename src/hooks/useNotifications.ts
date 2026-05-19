@@ -134,6 +134,29 @@ export function useNotifications() {
             await sendNotification('finance', 'Contas a Vencer', msg);
           }
         }
+        
+        // ALERTA 16h01 - Contas não pagas no dia do vencimento
+        if (now.getHours() === 16 && now.getMinutes() === 1) {
+          const today = now.toISOString().split('T')[0];
+          const unpaidToday = finances.filter(f => 
+            f.userId === uid && 
+            f.type === 'expense' && 
+            f.status === 'pending' && 
+            f.date === today
+          );
+          
+          if (unpaidToday.length > 0) {
+            const total = unpaidToday.reduce((s, f) => s + f.amount, 0);
+            const msg = `🚨 *ALERTA URGENTE - 16h01*\n\n` +
+              `⚠️ ${unpaidToday.length} conta(s) VENCEM HOJE e ainda não foram pagas!\n\n` +
+              unpaidToday.map(f => 
+                `• ${f.description}: R$ ${f.amount.toLocaleString('pt-BR')}`
+              ).join('\n') +
+              `\n\n💵 Total: R$ ${total.toLocaleString('pt-BR')}\n\n` +
+              `_Pague AGORA para evitar juros e multas!_`;
+            await sendNotification('finance', '⚠️ CONTAS VENCEM HOJE!', msg);
+          }
+        }
       }
       
       // Check habits (at 7pm)
